@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<head>
+  <title>Bedtime stories</title>
+  <link
+    rel="shortcut icon"
+    href="{{ url_for('static', filename='dog.png') }}"
+  />
+  <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}" />
+</head>
+
+<body>
+  <h3>Bed time stories</h3>
+  <form action="/" method="post">
+    <input type="text" name="main-character" placeholder="Main character name" required />
+    <input type="text" name="second-character" placeholder="Second character name" />
+    <input type="text" name="theme" placeholder="Theme" required />
+    <input type="number" name="age" placeholder="For age" required />
+    <br>
+    <input type="submit" value="Generate" />
+  </form>
+  {% if result %}
+  <h3>Result</h3>
+  <form action="/img" method="post" class="img-form">
+    <div class="txt-result" name="result">{{ result }}</div>
+    <h5>Generate image for response</h5>
+    <input type="submit" class="btn-generate" value="Generate" />
+  </form>
+  {% endif %}
+
+  <div class="img-container" style="display: none;"  >
+    <h3>Image</h3>
+    <img width="400px" class="img-result">
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      var img_form = document.querySelector(".img-form");
+      if (img_form) {
+        img_form.addEventListener("submit", function(e) {
+          e.preventDefault();
+          var result = document.querySelector(".txt-result").innerHTML;
+          var xhr = new XMLHttpRequest();
+          xhr.open("POST", "/img", true);
+          xhr.setRequestHeader("Content-Type", "application/json");
+          xhr.onload = function() {
+            if (xhr.status === 200) {
+              var jsonResponse = JSON.parse(xhr.responseText);
+              var img_result = document.querySelector(".img-result");
+              var img_container = document.querySelector(".img-container");
+              img_result.src =  jsonResponse["img_url"]
+              img_container.style.display = "block";
+            }
+          };
+          xhr.send(JSON.stringify({ result: result }));
+        });
+        function generateImage() {
+      }
+      }
+    });
+  </script>
+
+</body>

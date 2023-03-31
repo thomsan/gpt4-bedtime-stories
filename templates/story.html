@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<head>
+  <title>Bedtime stories</title>
+  <link
+    rel="shortcut icon"
+    href="{{ url_for('static', filename='dog.png') }}"
+  />
+  <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}" />
+</head>
+
+<body>
+  <h3>Bed time stories</h3>
+  {% if data %}
+  <h3>Chapter {{chapter}}</h3>
+  <img width="400px" class="chapter_img">
+  <div class="chapter_text"></div>
+  <button class="back-button">Back</button>
+  <button class="next-button">Continue</button>
+  {% endif %}
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const data = JSON.parse(urlParams.get('data'))
+        const chapter = JSON.parse(urlParams.get('chapter'))
+        var chapterText = document.querySelector(".chapter_text");
+        chapterText.innerHTML = data[chapter-1].text
+        var chapterImg = document.querySelector(".chapter_img");
+        chapterImg.src = data[chapter-1].img_url
+
+        var nextButton = document.querySelector(".next-button");
+        nextButton.addEventListener("click", onNextButtonClick);
+        var backButton = document.querySelector(".back-button");
+        backButton.addEventListener("click", onBackButtonClick);
+        if(chapter >= data.length){
+            var nextButton = document.querySelector(".next-button");
+            nextButton.style.display = "none";
+        } else {
+            var nextButton = document.querySelector(".next-button");
+            nextButton.style.display = "block";
+        }
+        if(chapter <= 1){
+            var backButton = document.querySelector(".back-button");
+            backButton.style.display = "none";
+            return
+        } else {
+            var backButton = document.querySelector(".back-button");
+            backButton.style.display = "block";
+        }
+
+
+        function onNextButtonClick(){
+            // show the next chapter
+            var url = window.location.href;
+            const urlParams = new URLSearchParams(window.location.search);
+            const chapter = JSON.parse(urlParams.get('chapter'))
+            var nextChapter = chapter+1
+            urlParams.set('chapter', chapter+1)
+            var newUrl = url.split('?')[0] + '?' + urlParams.toString();
+            window.history.replaceState(null, null, newUrl);
+            window.location.reload();
+        }
+
+        function onBackButtonClick(){
+            // show the previous chapter
+            var url = window.location.href;
+            const urlParams = new URLSearchParams(window.location.search);
+            const chapter = JSON.parse(urlParams.get('chapter'))
+            var prevChapter = chapter-1
+
+            urlParams.set('chapter', prevChapter)
+            var newUrl = url.split('?')[0] + '?' + urlParams.toString();
+            window.history.replaceState(null, null, newUrl);
+            window.location.reload();
+        }
+    });
+  </script>
+
+</body>
